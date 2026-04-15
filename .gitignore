@@ -14,3 +14,7 @@ outputs/
 .DS_Store
 briefing_*.html
 briefing_*.json
+
+.DS_Store
+briefing_*.html
+briefing_*.json
