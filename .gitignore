@@ -10,3 +10,7 @@ __pycache__/
 .pytest_cache/
 outputs/
 *.pyc
+
+.DS_Store
+briefing_*.html
+briefing_*.json
