@@ -1,17 +1,35 @@
 watchlist:
-  - ticker: AAPL
-    company_name: Apple Inc.
-    sector: Technology Hardware
-    alert_threshold: 3.0
-  - ticker: MSFT
-    company_name: Microsoft Corporation
-    sector: Software
-    alert_threshold: 3.0
   - ticker: NVDA
     company_name: NVIDIA Corporation
     sector: Semiconductors
     alert_threshold: 4.0
-  - ticker: JPM
-    company_name: JPMorgan Chase & Co.
-    sector: Financials
+
+  - ticker: IBKR
+    company_name: Interactive Brokers Group, Inc.
+    sector: Financial Services
+    alert_threshold: 3.0
+
+  - ticker: RKLB
+    company_name: Rocket Lab USA, Inc.
+    sector: Aerospace & Defense
+    alert_threshold: 5.0
+
+  - ticker: KRMN
+    company_name: Karman Holdings Inc.
+    sector: Aerospace & Defense
+    alert_threshold: 5.0
+
+  - ticker: WMT
+    company_name: Walmart Inc.
+    sector: Consumer Defensive
     alert_threshold: 2.5
+
+  - ticker: RTX
+    company_name: RTX Corporation
+    sector: Aerospace & Defense
+    alert_threshold: 3.0
+
+  - ticker: ORCL
+    company_name: Oracle Corporation
+    sector: Software
+    alert_threshold: 3.0
