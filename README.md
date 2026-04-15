@@ -4,7 +4,7 @@ A Python MVP for a watchlist-based market monitoring and daily briefing workflow
 
 The project reads a local stock watchlist, fetches market data and recent news, filters and ranks material developments, classifies event types, generates concise business summaries, and writes a daily HTML email briefing plus a structured JSON artifact.
 
-This is intentionally not a dashboard. It is a small investing operations workflow that can run once from the command line and can later be scheduled.
+This is intentionally not a dashboard. It is a small investing operations workflow that can run once from the command line or on the included daily GitHub Actions schedule.
 
 ## Architecture
 
@@ -180,17 +180,15 @@ The workflow:
 python main.py --market-data-mode yahoo --news-data-mode multi --send-email
 ```
 
-Add these GitHub Secrets in the repository settings under **Settings > Secrets and variables > Actions > New repository secret**:
+For email delivery from GitHub Actions, add these required GitHub Secrets in the repository settings under **Settings > Secrets and variables > Actions > New repository secret**:
 
 | Secret | Purpose |
 | --- | --- |
 | `SMTP_HOST` | SMTP server hostname, for example `smtp.gmail.com`. |
-| `SMTP_USERNAME` | SMTP login username. |
-| `SMTP_PASSWORD` | SMTP password or app password. |
 | `SMTP_FROM` | Sender email address. |
 | `SMTP_TO` | Recipient email address. |
 
-The workflow sets `SMTP_PORT=587` and `SMTP_USE_TLS=true`. Change those values in `.github/workflows/daily_briefing.yml` if your SMTP provider requires a different port or TLS setting.
+If your SMTP provider requires authentication, also add `SMTP_USERNAME` and `SMTP_PASSWORD`. The workflow sets `SMTP_PORT=587` and `SMTP_USE_TLS=true`. Change those values in `.github/workflows/daily_briefing.yml` if your SMTP provider requires a different port or TLS setting.
 
 To trigger the workflow manually:
 
