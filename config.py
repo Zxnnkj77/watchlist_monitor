@@ -72,9 +72,9 @@ def _output_dir_from_env(project_root: Path) -> Path:
 
 
 def _news_sources_from_env() -> tuple[str, ...]:
-    raw_value = os.getenv("NEWS_SOURCES", "yahoo,newsapi,google")
+    raw_value = os.getenv("NEWS_SOURCES", "yahoo,google")
     sources = tuple(source.strip().lower() for source in raw_value.split(",") if source.strip())
-    return sources or ("yahoo", "newsapi", "google")
+    return sources or ("yahoo", "google")
 
 
 def _bool_from_env(name: str, *, default: bool) -> bool:

@@ -51,7 +51,7 @@ The project can run without editing `.env` because mock data is enabled by defau
 | --- | --- |
 | `MARKET_DATA_MODE` | `mock`, `live`, `auto`, or `yahoo`. Defaults to `mock`. |
 | `NEWS_DATA_MODE` | `mock`, `live`, `auto`, or `multi`. Defaults to `mock`. |
-| `NEWS_SOURCES` | Comma-separated source list used by `NEWS_DATA_MODE=multi`. Supported values: `yahoo`, `newsapi`, `google`. |
+| `NEWS_SOURCES` | Comma-separated source list used by `NEWS_DATA_MODE=multi`. Supported values: `yahoo`, `newsapi`, `google`. Defaults to `yahoo,google`, which does not require NewsAPI. |
 | `ALPHA_VANTAGE_API_KEY` | Used by the Alpha Vantage market data adapter. |
 | `NEWSAPI_API_KEY` | Used by the NewsAPI adapter in `live`, `auto`, or `multi` mode when `newsapi` is enabled. |
 | `OUTPUT_DIR` | Output folder for generated `.html` and `.json` artifacts. Defaults to `outputs`. |
@@ -162,6 +162,55 @@ outputs/latest.json
 
 Use `outputs/latest.html` when you just want to open the newest report.
 
+## GitHub Actions Daily Briefing
+
+The repository includes `.github/workflows/daily_briefing.yml` to run the monitor automatically and by manual trigger.
+
+The workflow:
+
+- Runs from GitHub Actions on `ubuntu-latest`.
+- Checks out the repository.
+- Sets up Python 3.11.
+- Installs dependencies with `python -m pip install -r requirements.txt`.
+- Sets `NEWS_SOURCES=yahoo,google` so NewsAPI is not required.
+- Sets `KEEP_HISTORY=false` and writes only the latest generated files inside the runner.
+- Runs:
+
+```bash
+python main.py --market-data-mode yahoo --news-data-mode multi --send-email
+```
+
+Add these GitHub Secrets in the repository settings under **Settings > Secrets and variables > Actions > New repository secret**:
+
+| Secret | Purpose |
+| --- | --- |
+| `SMTP_HOST` | SMTP server hostname, for example `smtp.gmail.com`. |
+| `SMTP_USERNAME` | SMTP login username. |
+| `SMTP_PASSWORD` | SMTP password or app password. |
+| `SMTP_FROM` | Sender email address. |
+| `SMTP_TO` | Recipient email address. |
+
+The workflow sets `SMTP_PORT=587` and `SMTP_USE_TLS=true`. Change those values in `.github/workflows/daily_briefing.yml` if your SMTP provider requires a different port or TLS setting.
+
+To trigger the workflow manually:
+
+1. Open the repository on GitHub.
+2. Go to **Actions**.
+3. Select **Daily Watchlist Briefing**.
+4. Click **Run workflow**.
+5. Choose the branch and click **Run workflow** again.
+
+### Schedule
+
+GitHub Actions cron schedules are evaluated in UTC, not in a named timezone. To run at 8:00 AM `America/New_York`, the workflow has two schedule entries:
+
+```yaml
+- cron: "0 12 * * *"
+- cron: "0 13 * * *"
+```
+
+`12:00 UTC` matches 8:00 AM in New York during daylight saving time. `13:00 UTC` matches 8:00 AM in New York during standard time. A schedule gate at the start of the job checks the current hour with `TZ=America/New_York` and only continues when the local hour is `08`, so one of the two scheduled runs skips each day.
+
 ## Testing
 
 ```bash
@@ -200,7 +249,7 @@ NEWS_SOURCES=yahoo,newsapi,google
 NEWSAPI_API_KEY=your-newsapi-key
 ```
 
-Yahoo Finance and Google News RSS do not require API keys. NewsAPI is skipped in multi-source mode if `NEWSAPI_API_KEY` is not set.
+Yahoo Finance and Google News RSS do not require API keys and are the default multi-source providers. NewsAPI is optional and is skipped in multi-source mode if `NEWSAPI_API_KEY` is not set.
 
 ## What Works
 
@@ -226,14 +275,13 @@ Yahoo Finance and Google News RSS do not require API keys. NewsAPI is skipped in
 - Mock data is synthetic and deterministic.
 - Yahoo Finance data depends on yfinance availability and Yahoo's upstream response shape.
 - Google News RSS links may resolve through Google News redirect URLs.
-- There is no scheduler, database, position sizing, portfolio context, or authentication.
+- There is no database, position sizing, portfolio context, or authentication.
 
 ## What To Build Next
 
-1. Add a scheduler such as cron, GitHub Actions, or a small job runner.
-2. Replace keyword summarization with an LLM or a more structured extraction layer.
-3. Add provider-specific tests using recorded fixtures.
-4. Add SEC filings, press releases, and earnings calendar sources.
-5. Track previous run state to detect new developments since the last briefing.
-6. Add portfolio metadata such as position size, thesis, owner, and review priority.
-7. Add alert routing for high-severity items through Slack, email labels, or ticketing.
+1. Replace keyword summarization with an LLM or a more structured extraction layer.
+2. Add provider-specific tests using recorded fixtures.
+3. Add SEC filings, press releases, and earnings calendar sources.
+4. Track previous run state to detect new developments since the last briefing.
+5. Add portfolio metadata such as position size, thesis, owner, and review priority.
+6. Add alert routing for high-severity items through Slack, email labels, or ticketing.
