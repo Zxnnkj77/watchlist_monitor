@@ -200,14 +200,13 @@ To trigger the workflow manually:
 
 ### Schedule
 
-GitHub Actions cron schedules are evaluated in UTC, not in a named timezone. To run at 8:00 AM `America/New_York`, the workflow has two schedule entries:
+GitHub Actions cron schedules are evaluated in UTC, not in a named timezone. For the current test, the workflow is scheduled at about 11:10 AM `America/New_York` during daylight saving time:
 
 ```yaml
-- cron: "0 12 * * *"
-- cron: "0 13 * * *"
+- cron: "10 15 * * *"
 ```
 
-`12:00 UTC` matches 8:00 AM in New York during daylight saving time. `13:00 UTC` matches 8:00 AM in New York during standard time. A schedule gate at the start of the job checks the current hour with `TZ=America/New_York` and only continues when the local hour is `08`, so one of the two scheduled runs skips each day.
+`15:10 UTC` matches 11:10 AM in New York during daylight saving time. A schedule gate at the start of the job checks the New York UTC offset before continuing.
 
 ## Testing
 

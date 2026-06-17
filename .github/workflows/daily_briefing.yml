@@ -3,10 +3,9 @@ name: Daily Watchlist Briefing
 on:
   workflow_dispatch:
   schedule:
-    # GitHub cron uses UTC. These two entries cover 8:00 AM America/New_York
-    # during daylight saving time (12:00 UTC) and standard time (13:00 UTC).
-    - cron: "0 12 * * *"
-    - cron: "0 13 * * *"
+    # GitHub cron uses UTC. This test run targets 11:10 AM
+    # America/New_York during daylight saving time (15:10 UTC).
+    - cron: "10 15 * * *"
 
 jobs:
   daily-briefing:
@@ -32,6 +31,16 @@ jobs:
           if [[ "${{ github.event_name }}" != "schedule" ]]; then
             echo "should_run=true" >> "$GITHUB_OUTPUT"
             exit 0
+          fi
+
+          schedule="${{ github.event.schedule }}"
+          ny_offset="$(TZ=America/New_York date +%z)"
+
+          if [[ "$schedule" == "10 15 * * *" && "$ny_offset" == "-0400" ]]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping schedule '$schedule' because America/New_York offset is $ny_offset."
           fi
 
       - name: Check out repository
